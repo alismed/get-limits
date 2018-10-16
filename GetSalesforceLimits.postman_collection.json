@@ -1,0 +1,314 @@
+{
+	"info": {
+		"name": "Get Salesforce Limits",
+		"_postman_id": "0d09e7ae-3f61-da1a-10f3-500319beb33a",
+		"description": "Lists information about limits in Salesforce org",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3479ac0e-8240-462b-ae6e-57e17f2cf822",
+						"type": "text/javascript",
+						"exec": [
+							"var responseJSON;",
+							"",
+							"responseJSON = JSON.parse(responseBody);",
+							"",
+							"if (pm.response.code === 200) {",
+							"",
+							"    pm.globals.set(\"accessToken\", responseJSON.access_token);",
+							"    pm.globals.set(\"instanceUrl\", responseJSON.instance_url);",
+							"    pm.globals.set(\"tokenType\", responseJSON.token_type);",
+							"    ",
+							"} else {",
+							"    console.log(pm.response.status);",
+							"}",
+							"",
+							"// Tests",
+							"pm.test(\"Result Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Results contains Access Token\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"access_token\");",
+							"});",
+							"",
+							"pm.test(\"Results contains Instance url\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"instance_url\");",
+							"});",
+							"",
+							"pm.test(\"Results in JSON format contains a especific value\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(responseJSON.token_type).to.eql(\"Bearer\");",
+							"});",
+							"",
+							"pm.test(\"Results contains a especific token type\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Bearer\");",
+							"});",
+							"",
+							"pm.test(\"Global Variable is present\", function () {",
+							"    pm.expect(pm.globals.get(\"accessToken\")).not.eql(null);",
+							"});",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{clientId}}",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{clientSecret}}",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{userName}}",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}{{securityToken}}",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/services/oauth2/token",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"services",
+						"oauth2",
+						"token"
+					]
+				},
+				"description": "uses the OAuth 2.0 protocol and connected app to authenticate"
+			},
+			"response": []
+		},
+		{
+			"name": "List Organization Limits",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "65f8b7b5-be29-48e7-8576-0a492874eaa8",
+						"type": "text/javascript",
+						"exec": [
+							"//console.log(\"pre-request: \" + pm.variables.get(\"instanceUrl\"));",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b563389a-1380-49cf-a2fd-64e06fd11459",
+						"type": "text/javascript",
+						"exec": [
+							"var responseJSON;",
+							"responseJSON = JSON.parse(responseBody);",
+							"",
+							"// Tests",
+							"pm.test(\"Result Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Global Variable API Version is present\", function () {",
+							"    pm.expect(pm.globals.get(\"apiVersion\")).not.eql(null);",
+							"});",
+							"",
+							"pm.test(\"Results in JSON format contains DailyApiRequests\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(responseJSON).to.have.property(\"DailyApiRequests\");",
+							"});",
+							"",
+							"pm.test(\"Results in JSON format contains DailyApiRequests\", function () {",
+							"    pm.expect(responseJSON).to.have.property(\"DailyApiRequests\");",
+							"});",
+							"",
+							"pm.test(\"Results in JSON format contains SingleEmail\", function () {",
+							"    pm.expect(responseJSON).to.have.property(\"SingleEmail\");",
+							"});",
+							"",
+							"pm.test(\"Results in JSON format contains MassEmail\", function () {",
+							"    pm.expect(responseJSON).to.have.property(\"MassEmail\");",
+							"});",
+							"",
+							"pm.test(\"File Storage Remaining is higher than 25%\", function () {",
+							"    var maxMb = responseJSON.FileStorageMB.Max;",
+							"    var remainingMb = responseJSON.FileStorageMB.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Data Storage Remaining is higher than 25%\", function () {",
+							"    var maxMb = responseJSON.DataStorageMB.Max;",
+							"    var remainingMb = responseJSON.DataStorageMB.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Daily Api Requests remaining is less than 20%\", function () {",
+							"    var maxMb = responseJSON.DailyApiRequests.Max;",
+							"    var remainingMb = responseJSON.DailyApiRequests.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(20);",
+							"});",
+							"",
+							"pm.test(\"Daily Async Apex Executions remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.DailyAsyncApexExecutions.Max;",
+							"    var remainingMb = responseJSON.DailyAsyncApexExecutions.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Daily Bulk Api Requests remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.DailyBulkApiRequests.Max;",
+							"    var remainingMb = responseJSON.DailyBulkApiRequests.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Daily Generic Streaming Api Events remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.DailyGenericStreamingApiEvents.Max;",
+							"    var remainingMb = responseJSON.DailyGenericStreamingApiEvents.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Daily Streaming Api Events remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.DailyStreamingApiEvents.Max;",
+							"    var remainingMb = responseJSON.DailyStreamingApiEvents.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Daily Workflow Emails remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.DailyWorkflowEmails.Max;",
+							"    var remainingMb = responseJSON.DailyWorkflowEmails.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Mass Email remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.MassEmail.Max;",
+							"    var remainingMb = responseJSON.MassEmail.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Single Email remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.SingleEmail.Max;",
+							"    var remainingMb = responseJSON.SingleEmail.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Permission Sets remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.PermissionSets.Max;",
+							"    var remainingMb = responseJSON.PermissionSets.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"pm.test(\"Permission Sets Create Custom remaning is less than 25%\", function () {",
+							"    var maxMb = responseJSON.PermissionSets.CreateCustom.Max;",
+							"    var remainingMb = responseJSON.PermissionSets.CreateCustom.Remaining;",
+							"    var remainingRatio = (remainingMb*100)/maxMb;",
+							"    pm.expect(remainingRatio).to.be.above(25);",
+							"});",
+							"",
+							"",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenType}} {{accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{instanceUrl}}/services/data/{{apiVersion}}/limits/",
+					"host": [
+						"{{instanceUrl}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"{{apiVersion}}",
+						"limits",
+						""
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "52ed0eb5-d897-4a04-b77d-86735c96c5de",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ebc39172-4bc7-4f5b-9fd2-e4dfc2edf0f7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
