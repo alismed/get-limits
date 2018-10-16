@@ -2,7 +2,7 @@
 
 Lists information about limits in Salesforce org
 
-Using [Postman](https://www.getpostman.com/) to lists information about Salesforce limits with [rest api](https://cnt.prd.itau/blogs/8d942221-ab88-4f33-86ba-1fa88a0229b6/entry/Rest_API).
+Using [Postman](https://www.getpostman.com/) to lists information about Salesforce limits with [rest api](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_what_is_rest_api.htm).
  
  This use OAuth 2.0 protocol and [connected app](https://help.salesforce.com/articleView?id=connected_app_overview.htm&type=5) to authenticate before consume the api.
 
